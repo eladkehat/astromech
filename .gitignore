@@ -1,0 +1,33 @@
+log/
+tmp/
+
+# Byte-compiled / optimized / DLL files
+*.py[cod]
+__pycache__/
+*.so
+
+# Pipfile.lock - dependencies must not be pinned in a library
+Pipfile.lock
+
+# Test-related
+.cache
+.coverage
+htmlcov/
+.mypy_cache
+.pytest_cache
+.tox
+
+# Docs
+docs/
+
+# Created by setuptools
+build/
+dist/
+.eggs*
+.venv*
+*.egg
+*.egg-info
+.python-version
+
+# OS X stuff
+.DS_Store
