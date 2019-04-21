@@ -105,6 +105,10 @@ def default_path(
 def exists(bucket: str, key: str) -> bool:
     """Checks whether an object exists on S3.
 
+    Note that this function only works for objects ("files") in S3, not key prefixes.
+    For example, if there's an object with key "path/to/object.txt", calling this function
+    with "path/to/" returns False.
+
     Args:
         bucket: The S3 bucket name.
         key: The S3 key.
