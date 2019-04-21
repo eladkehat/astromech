@@ -50,3 +50,16 @@ def test_exists():
         stubber.add_response('get_item', response, expected_params)
         assert dynamodb.exists({'Id': '12345'})
     dynamodb._table = None
+
+
+def test_does_not_exist():
+    dynamodb.table('test-table')
+    expected_params = {
+        'TableName': 'test-table',
+        'Key': {'Id': botocore.stub.ANY},
+        'ProjectionExpression': 'Id'}
+    response = {'ResponseMetadata': {}}
+    with botocore.stub.Stubber(dynamodb.resource().meta.client) as stubber:
+        stubber.add_response('get_item', response, expected_params)
+        assert not dynamodb.exists({'Id': '12345'})
+    dynamodb._table = None
