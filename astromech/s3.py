@@ -24,12 +24,17 @@ def client() -> botocore.client.BaseClient:
     Use it inside your code whenever you need an S3 client, rather than creating a new one
     or using the global client object directly.
 
+    If the environment variable "LOCALSTACK_S3_URL" is present, uses that as the endpoint_url,
+    instead of the real AWS URL.
+
     Returns:
         The S3 client object.
     """
     global _client
     if _client is None:
-        _client = boto3.client('s3')
+        endpoint_url = os.environ.get('LOCALSTACK_S3_URL')
+        # If endpoint_url is None, botocore constructs the default AWS URL
+        _client = boto3.client('s3', endpoint_url=endpoint_url)
     return _client
 
 
@@ -199,7 +204,6 @@ def put_bytes(buf: bytes, bucket: str, key: str, tags: dict = {}) -> Tuple[str, 
         - The number of bytes written (length of the buffer).
     """
     logger.debug(f'Writing {len(buf)} bytes to s3://{bucket}/{key}')
-
     tagging = urllib.parse.urlencode(tags)
     client().put_object(Bucket=bucket, Key=key, Body=buf, Tagging=tagging)
     return (bucket, key, len(buf))

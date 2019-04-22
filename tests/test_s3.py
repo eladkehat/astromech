@@ -1,4 +1,5 @@
 import io
+import re
 
 import botocore.client
 import botocore.stub
@@ -22,6 +23,19 @@ def test_client():
     client = s3.client()
     assert isinstance(client, botocore.client.BaseClient)
     assert s3._client == client
+    assert re.fullmatch(r'https?:\/\/s3\.amazonaws\.com', client.meta.endpoint_url)
+    s3._client = None
+
+
+def test_localstack_client(monkeypatch):
+    localstack_url = 'http://localhost:4572'
+    assert s3._client is None
+    with monkeypatch.context() as m:
+        m.setenv('LOCALSTACK_S3_URL', localstack_url)
+        client = s3.client()
+        assert client.meta.endpoint_url == localstack_url
+    assert s3.client().meta.endpoint_url == localstack_url
+    s3._client = None
 
 
 def test_parse_uri():

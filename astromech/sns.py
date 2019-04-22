@@ -24,12 +24,17 @@ def client() -> botocore.client.BaseClient:
     Use it inside your code whenever you need an SNS client, rather than creating a new one
     or using the global client object directly.
 
+    If the environment variable "LOCALSTACK_SNS_URL" is present, uses that as the endpoint_url,
+    instead of the real AWS URL.
+
     Returns:
         The SNS client object.
     """
     global _client
     if _client is None:
-        _client = boto3.client('sns')
+        endpoint_url = os.environ.get('LOCALSTACK_SNS_URL')
+        # If endpoint_url is None, botocore constructs the default AWS URL
+        _client = boto3.client('sns', endpoint_url=endpoint_url)
     return _client
 
 

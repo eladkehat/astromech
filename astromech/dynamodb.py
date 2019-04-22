@@ -3,6 +3,7 @@ from typing import Optional
 
 import boto3
 import boto3.dynamodb.table
+import botocore
 
 _resource = None
 """A DynamoDb service resource, initialized lazily by `resource()` or `table()`.
@@ -31,13 +32,31 @@ def resource() -> boto3.resources.base.ServiceResource:
     Use it inside your code whenever you need a DynamoDB service resource, rather than creating
     a new one or using the global resource object directly.
 
+    If the environment variable "LOCALSTACK_DYNAMODB_URL" is present, uses that as the endpoint_url,
+    instead of the real AWS URL.
+    Use this to work with dynamodb-local for example.
+
     Returns:
         The DynamoDB service resource object.
     """
     global _resource
     if _resource is None:
-        _resource = boto3.resource('dynamodb')
+        endpoint_url = os.environ.get('LOCALSTACK_DYNAMODB_URL')
+        # If endpoint_url is None, botocore constructs the default AWS URL
+        _resource = boto3.resource('dynamodb', endpoint_url=endpoint_url)
     return _resource
+
+
+def client() -> botocore.client.BaseClient:
+    """Returns a low level client to DynamoDB.
+
+    This function returns the client used by the global _resource.
+    See `resource()` for more information.
+
+    Returns:
+        A DynamoDB client object.
+    """
+    return resource().meta.client
 
 
 def table(table_name: Optional[str] = None) -> boto3.dynamodb.table.TableResource:
@@ -51,6 +70,10 @@ def table(table_name: Optional[str] = None) -> boto3.dynamodb.table.TableResourc
     This function always returns the global table object, initializing it if necessary.
     Use it inside your code whenever you need an DynamoDB table, rather than creating a new
     one or using the global table object directly.
+
+    If the environment variable "LOCALSTACK_DYNAMODB_URL" is present, uses that as the endpoint_url,
+    instead of the real AWS URL.
+    Use this to work with dynamodb-local for example.
 
     Args:
         table_name: Name of the DynamoDB table.
