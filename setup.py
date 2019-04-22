@@ -8,7 +8,7 @@ with open('README.md') as f:
 setuptools.setup(
     name='astromech',
     use_scm_version=True,
-    description='Utilities for AWS Lambda functions',
+    description='AWS service utilities for Lambda functions',
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/eladkehat/astromech',
