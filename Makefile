@@ -23,7 +23,7 @@ test:
 	python3 -m pytest -vv
 
 coverage:
-	python3 -m pytest --cov=$(appname) --cov-fail-under=100 --cov-report=term --cov-report=html
+	python3 -m pytest --cov=$(appname) --cov-fail-under=100 --cov-report=term --cov-report=html || open htmlcov/index.html
 
 tag:
 	git tag $(TAG)
