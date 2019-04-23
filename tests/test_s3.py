@@ -116,7 +116,7 @@ def test_get_tags(bucket, key):
 def test_put_bytes(bucket, key):
     buf = b'Lorem ipsum dolor sit amet'
     service_response = {'ETag': '6bcf86bed8807b8e78f0fc6e0a53079d-380'}
-    expected_params = {'Bucket': bucket, 'Key': key, 'Body': buf, 'Tagging': ''}
+    expected_params = {'Bucket': bucket, 'Key': key, 'Body': buf, 'Tagging': '', 'ACL': 'private'}
     with botocore.stub.Stubber(s3.client()) as stubber:
         stubber.add_response('put_object', service_response, expected_params)
         assert s3.put_bytes(buf, bucket, key) == (bucket, key, len(buf))
@@ -125,3 +125,8 @@ def test_put_bytes(bucket, key):
         expected_params['Tagging'] = 'key1=value1&key2=2'
         stubber.add_response('put_object', service_response, expected_params)
         assert s3.put_bytes(buf, bucket, key, tags) == (bucket, key, len(buf))
+        # Now with a non-default ACL:
+        acl = 'public-read'
+        expected_params['ACL'] = acl
+        stubber.add_response('put_object', service_response, expected_params)
+        assert s3.put_bytes(buf, bucket, key, tags, acl) == (bucket, key, len(buf))

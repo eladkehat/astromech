@@ -185,7 +185,7 @@ def get_tags(bucket: str, key: str) -> dict:
     return dict((tag['Key'], tag['Value']) for tag in response['TagSet'])
 
 
-def put_bytes(buf: bytes, bucket: str, key: str, tags: dict = {}) -> Tuple[str, str, int]:
+def put_bytes(buf: bytes, bucket: str, key: str, tags: dict = {}, acl: str = 'private') -> Tuple[str, str, int]:
     """Writes a buffer to S3.
 
     Args:
@@ -196,6 +196,8 @@ def put_bytes(buf: bytes, bucket: str, key: str, tags: dict = {}) -> Tuple[str, 
             Note that allowed characters for tags are Unicode letters, whitespace, and numbers, plus the following
             special characters: + - = . _ : /
             For additional characters, use base-64 encoding.
+        acl: The canned ACL for the object.
+            For options see: https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html#canned-acl
 
     Returns:
         A 3-tuple:
@@ -205,5 +207,5 @@ def put_bytes(buf: bytes, bucket: str, key: str, tags: dict = {}) -> Tuple[str, 
     """
     logger.debug(f'Writing {len(buf)} bytes to s3://{bucket}/{key}')
     tagging = urllib.parse.urlencode(tags)
-    client().put_object(Bucket=bucket, Key=key, Body=buf, Tagging=tagging)
+    client().put_object(Bucket=bucket, Key=key, Body=buf, Tagging=tagging, ACL=acl)
     return (bucket, key, len(buf))
